@@ -1,25 +1,31 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Muse
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [prompt, setPrompt] = useState("");  // for user input
+  const [images, setImages] = useState([]);  // for storing generated images
+  const [loading, setLoading] = useState(false);  // loading state for API call
+
+  // Function to handle prompt generation
+  const handleGenerate = () => {
+    if (prompt.trim()) {
+      setLoading(true);
+      fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt })
+      })
+      .then(response => response.json())
+      .then(data => {
+        setImages(data.images);  // assuming data.images returns URLs
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        setLoading(false);
+      });
+    }
+  };
 }
 
 export default App;
