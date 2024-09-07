@@ -39,6 +39,43 @@ function App() {
     link.download = 'image.jpg';
     link.click();
   };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Create art from words</h1>
+        
+        {/* text input box */}
+        <input
+          type="text"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Type your art prompt here..."
+        />
+        
+        {/* generate image button */}
+        <button onClick={handleGenerate}>Create a Picture</button>
+        
+        {/* image display section */}
+        <div className="images-section">
+          {loading ? (
+            <p>Generating images...</p>
+          ) : (
+            images.map((img, index) => (
+              <div key={index}>
+                <img src={img.url} alt={img.description} />
+                <p>{img.description}</p>
+                <button onClick={() => handleDownload(img.url)}>Download</button>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* refresh/download buttons */}
+        <button onClick={handleRefresh}>Refresh</button>
+      </header>
+    </div>
+  );
 }
 
 export default App;
