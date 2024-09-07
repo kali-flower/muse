@@ -2,7 +2,7 @@
 .App {
   background-color: #f7f7f7; 
   min-height: 100vh;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
   text-align: center;
 }
 
@@ -41,7 +41,7 @@ button {
   border-radius: 5px;
   cursor: pointer;
   margin: 10px;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
   transition: transform 0.3s ease, background 0.3s ease;
 }
 
