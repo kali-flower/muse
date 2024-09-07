@@ -32,8 +32,8 @@ function App() {
     handleGenerate();  // re-calls generate function
   };
 
-   // function to download images
-   const handleDownload = (url) => {
+  // function to download images
+  const handleDownload = (url) => {
     const link = document.createElement('a');
     link.href = url;
     link.download = 'image.jpg';
@@ -43,7 +43,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Your next stroke of inspiration is just a click away</h1>
+        <h1>Your next stroke of inspiration is just a click away</h1> {/* header text */}
+        <p className="sub-header">Type your mood, get your match</p> {/* subheader text */}
         
         {/* text input box */}
         <input
