@@ -43,7 +43,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Create art from words</h1>
+        <h1>Your next stroke of inspiration is just a click away</h1>
         
         {/* text input box */}
         <input

@@ -29,17 +29,19 @@ button {
   padding: 12px 24px;
   font-size: 1.2rem;
   color: white;
-  background-color: #6200ea;
+  background: linear-gradient(to right, #B06AB3, #4568DC);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   margin: 10px;
   font-family: 'Roboto', sans-serif;
+  transition: transform 0.3s ease, background 0.3s ease;
 }
 
 /* button hover effect */
 button:hover {
-  background-color: #3700b3;
+  /* background: linear-gradient(to right, #4568DC, #B06AB3); */
+  transform: scale(1.05); /* slightly enlarge the button */
 }
 
 /* button disabled */
@@ -55,7 +57,7 @@ button:disabled {
 
 .images-section img {
   max-width: 300px;
-  height: auto;gti
+  height: auto;
   border-radius: 10px;
   margin-bottom: 10px;
 }
