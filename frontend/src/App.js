@@ -31,6 +31,14 @@ function App() {
   const handleRefresh = () => {
     handleGenerate();  // re-calls generate function
   };
+
+   // function to download images
+   const handleDownload = (url) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'image.jpg';
+    link.click();
+  };
 }
 
 export default App;
