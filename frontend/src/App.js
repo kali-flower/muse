@@ -6,7 +6,7 @@ function App() {
   const [images, setImages] = useState([]);  // for storing generated images
   const [loading, setLoading] = useState(false);  // loading state for API call
 
-  // Function to handle prompt generation
+  // function to handle prompt generation
   const handleGenerate = () => {
     if (prompt.trim()) {
       setLoading(true);
@@ -17,7 +17,7 @@ function App() {
       })
       .then(response => response.json())
       .then(data => {
-        setImages(data.images);  // assuming data.images returns URLs
+        setImages(data.images);  // data.images returns image URL
         setLoading(false);
       })
       .catch(error => {
@@ -25,6 +25,11 @@ function App() {
         setLoading(false);
       });
     }
+  };
+
+  // refresh images with the same prompt
+  const handleRefresh = () => {
+    handleGenerate();  // re-calls generate function
   };
 }
 
