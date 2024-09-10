@@ -8,16 +8,34 @@ const ImageGenerator = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (prompt.trim()) {
       setLoading(true);
-      // simulating API call
-      setTimeout(() => {
-        setImages([{ url: "/api/placeholder/300/300", description: prompt }]);
+      try {
+        const response = await fetch("http://localhost:5000/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt }),
+        });
+  
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+  
+        const data = await response.json();
+        setImages(data.images); // set images from the response
+        // log the generated keywords
+        console.log("Generated Keywords:", data.keywords);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      } finally {
         setLoading(false);
-      }, 1500);
+      }
     }
   };
+  
 
   const handleRefresh = () => {
     handleGenerate();
