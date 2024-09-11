@@ -45,18 +45,27 @@ const ImageGenerator = () => {
   };
 
   // function to download images as image.png
-  const handleDownload = (url) => {
-    if (!url) return; 
+  const handleDownload = async (url) => {
+    if (!url) return;
 
-    const link = document.createElement('a'); // create anchor element
-    link.href = url; // set image URL as the href
-    link.download = 'image.png'; 
-    document.body.appendChild(link); 
-    link.click(); 
-    document.body.removeChild(link); // remove the link after download
+    try {
+      // fetch image as a Blob
+      const response = await fetch(url);
+      const blob = await response.blob(); // create blob from response
+
+      const link = document.createElement('a'); // create anchor element
+      link.href = URL.createObjectURL(blob); // create local URL for blob
+      link.download = 'image.png'; // set filename to image.png
+      document.body.appendChild(link); 
+      link.click(); 
+      document.body.removeChild(link); // remove link after download
+
+      // clean up object URL
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("Error downloading the image:", error);
+    }
   };
-
-
 
   // styling with Tailwind CSS
   return (
