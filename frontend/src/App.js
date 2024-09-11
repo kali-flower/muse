@@ -4,48 +4,53 @@ import { faRedo, faDownload } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 
 const ImageGenerator = () => {
+  // state variables for managing prompt/generated images/loading state 
   const [prompt, setPrompt] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // function to generate images based on user prompt
   const handleGenerate = async () => {
-    if (prompt.trim()) {
+    if (prompt.trim()) { // only generate if prompt isn't empty 
       setLoading(true);
       try {
+        // API request to backend to generate images 
         const response = await fetch("http://localhost:5000/generate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt }), // send prompt to backend
         });
   
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
   
-        const data = await response.json();
+        const data = await response.json(); // parse JSON response 
         setImages(data.images); // set images from the response
         // log the generated keywords
         console.log("Generated Keywords:", data.keywords);
       } catch (error) {
         console.error("Error fetching images:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); // turn off loading state after request is finished 
       }
     }
   };
   
-
+  // refresh images by re-calling generate function 
   const handleRefresh = () => {
     handleGenerate();
   };
 
+  // function to download images (implement someday lol)
   const handleDownload = (url) => {
     // would trigger download in real app 
     console.log("Downloading:", url);
   };
 
+  // styling with Tailwind CSS
   return (
     <div className="min-h-screen bg-white font-sans p-6 flex flex-col items-center">
       <div className="w-full flex justify-center mb-3">
