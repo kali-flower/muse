@@ -48,7 +48,7 @@ def search_unsplash_images(keywords):
     }
     params = {
         "query": keywords,
-        "per_page": 5  # number of images to return
+        "per_page": 1  # number of images to return
     }
     
     response = requests.get(url, headers=headers, params=params)

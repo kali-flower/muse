@@ -44,17 +44,18 @@ const ImageGenerator = () => {
     handleGenerate();
   };
 
-  // function to download images
+  // function to download images as image.png
   const handleDownload = (url) => {
-    if (!url) return;
+    if (!url) return; 
 
     const link = document.createElement('a'); // create anchor element
-    link.href = url; // set the image URL as href
-    link.download = 'image.jpg'; // set filename
+    link.href = url; // set image URL as the href
+    link.download = 'image.png'; 
     document.body.appendChild(link); 
     link.click(); 
-    document.body.removeChild(link); // remove link after download
+    document.body.removeChild(link); // remove the link after download
   };
+
 
 
   // styling with Tailwind CSS
