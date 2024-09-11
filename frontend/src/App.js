@@ -44,11 +44,18 @@ const ImageGenerator = () => {
     handleGenerate();
   };
 
-  // function to download images (implement someday lol)
+  // function to download images
   const handleDownload = (url) => {
-    // would trigger download in real app 
-    console.log("Downloading:", url);
+    if (!url) return;
+
+    const link = document.createElement('a'); // create anchor element
+    link.href = url; // set the image URL as href
+    link.download = 'image.jpg'; // set filename
+    document.body.appendChild(link); 
+    link.click(); 
+    document.body.removeChild(link); // remove link after download
   };
+
 
   // styling with Tailwind CSS
   return (
