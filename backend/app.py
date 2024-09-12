@@ -25,47 +25,56 @@ def home():
 @app.route('/generate', methods=['POST'])
 def generate_prompt():
     data = request.json
-    prompt = data.get('prompt')
+    user_prompt = data.get('prompt')
 
-    # create GenerativeModel object 
     model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # generate keywords/content based on prompt
-    response = model.generate_content(f"Generate keywords for an art prompt: {prompt}")
-    
-    # extract generated text from response
-    generated_keywords = response.text.strip()
-    
-    # call Unsplash API to search for images
-    unsplash_images = search_unsplash_images(generated_keywords)
-
-    return jsonify({"keywords": generated_keywords, "images": unsplash_images})
+    try:
+        # instructions for Gemini
+        gemini_prompt = f"""
+        Generate 3-5 specific, visual keywords related to '{user_prompt}'.
+        Focus on describing visual elements, colors, or scenes directly related to the prompt.
+        Aim for concrete, imageable concepts that would make good search terms for pictures.
+        Separate keywords with commas.
+        """
+        
+        response = model.generate_content(gemini_prompt)
+        generated_keywords = response.text.strip()
+        
+        # process keywords
+        keywords_list = [kw.strip() for kw in generated_keywords.split(',')]
+        
+        # combine user input with generated keywords
+        search_query = f"{user_prompt} {' '.join(keywords_list)}"
+        
+        unsplash_images = search_unsplash_images(search_query)
+        
+        return jsonify({"keywords": generated_keywords, "images": unsplash_images})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def search_unsplash_images(keywords):
-    url = f"https://api.unsplash.com/search/photos"
+    url = "https://api.unsplash.com/search/photos"
     headers = {
         "Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}"
     }
     params = {
         "query": keywords,
-        "per_page": 1  # number of images to return
+        "per_page": 5,
+        "orientation": "landscape"  # optional (for more consistent results lol)
     }
     
-    response = requests.get(url, headers=headers, params=params)
-    
-    if response.status_code == 200:
-        data = response.json()
-        images = []
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
         
-        # extract image URLs from response
-        for image in data['results']:
-            images.append({
-                "url": image['urls']['regular'],
-                "description": image['alt_description'] or "No description available"
-            })
+        data = response.json()
+        images = [{"url": img['urls']['regular'], "description": img['alt_description'] or "No description available"}
+                  for img in data['results']]
         
         return images
-    else:
+    except requests.RequestException as e:
+        print(f"Unsplash API error: {e}")
         return []
 
 if __name__ == '__main__':
