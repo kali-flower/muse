@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS 
 import google.generativeai as genai
 import os
+import random
 from dotenv import load_dotenv
 import requests
 
@@ -67,8 +68,9 @@ def search_unsplash_images(keywords, original_prompt, fallback=False):
     }
     params = {
         "query": keywords if not fallback else original_prompt,
-        "per_page": 5,
-        "orientation": "landscape"
+        "per_page": 10,  
+        "orientation": "landscape",
+        "order_by": "relevant" 
     }
     
     try:
@@ -83,7 +85,8 @@ def search_unsplash_images(keywords, original_prompt, fallback=False):
             # if no results, try again with just the original prompt
             return search_unsplash_images(keywords, original_prompt, fallback=True)
         
-        return images
+        # randomly select 5 images from the 10 fetched
+        return random.sample(images, min(5, len(images)))
     except requests.RequestException as e:
         print(f"Unsplash API error: {e}")
         return []
