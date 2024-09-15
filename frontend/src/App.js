@@ -1,80 +1,102 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRedo, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faRedo, faDownload, faCheck } from '@fortawesome/free-solid-svg-icons';
+import JSZip from 'jszip';
 import './App.css';
 
 const ImageGenerator = () => {
-  // state variables for managing prompt/generated images/loading state 
   const [prompt, setPrompt] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showCheckboxes, setShowCheckboxes] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
 
-  // function to generate images based on user prompt
   const handleGenerate = async () => {
-    if (prompt.trim()) { // only generate if prompt isn't empty 
+    if (prompt.trim()) {
       setLoading(true);
       try {
-        // API request to backend to generate images 
         const response = await fetch("http://localhost:5000/generate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ prompt }), // send prompt to backend
+          body: JSON.stringify({ prompt }),
         });
   
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
   
-        const data = await response.json(); // parse JSON response 
-        setImages(data.images); // set images from the response
-        // log the generated keywords
+        const data = await response.json();
+        setImages(data.images);
         console.log("Generated Keywords:", data.keywords);
       } catch (error) {
         console.error("Error fetching images:", error);
       } finally {
-        setLoading(false); // turn off loading state after request is finished 
+        setLoading(false);
+        setShowCheckboxes(false);
+        setSelectedImages([]);
       }
     }
   };
   
-  // refresh images by re-calling generate function 
   const handleRefresh = () => {
     handleGenerate();
   };
 
-  // function to download images as image.png
+  const toggleImageSelection = (index) => {
+    setSelectedImages(prev => 
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    );
+  };
+
+  const handleDownloadSelected = async () => {
+    if (selectedImages.length === 0) return;
+
+    if (selectedImages.length === 1) {
+      handleDownload(images[selectedImages[0]].url);
+    } else {
+      const zip = new JSZip();
+      
+      for (let i = 0; i < selectedImages.length; i++) {
+        const imageIndex = selectedImages[i];
+        const response = await fetch(images[imageIndex].url);
+        const blob = await response.blob();
+        zip.file(`image${i + 1}.png`, blob);
+      }
+      
+      const content = await zip.generateAsync({type: "blob"});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = 'images.zip';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const handleDownload = async (url) => {
     if (!url) return;
 
     try {
-      // fetch image as a Blob
       const response = await fetch(url);
-      const blob = await response.blob(); // create blob from response
-
-      const link = document.createElement('a'); // create anchor element
-      link.href = URL.createObjectURL(blob); // create local URL for blob
-      link.download = 'image.png'; // set filename to image.png
-      document.body.appendChild(link); 
-      link.click(); 
-      document.body.removeChild(link); // remove link after download
-
-      // clean up object URL
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'image.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
     } catch (error) {
       console.error("Error downloading the image:", error);
     }
   };
 
-  // styling with Tailwind CSS
   return (
     <div className="min-h-screen bg-white font-sans p-6 flex flex-col items-center">
       <div className="w-full flex justify-center mb-3">
-        <h1 
-          className="text-4xl font-bold text-[#1f1f1f] mb-2 text-center"
-          style={{ whiteSpace: 'nowrap' }} 
-        >
+        <h1 className="text-4xl font-bold text-[#1f1f1f] mb-2 text-center whitespace-nowrap">
           Your next stroke of inspiration is just a click away!
         </h1>
       </div>
@@ -97,8 +119,7 @@ const ImageGenerator = () => {
         <button
           onClick={handleGenerate}
           disabled={loading || !prompt.trim()}
-          className="w-full p-3 text-lg text-white rounded-md mb-4 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(to right, #B06AB3, #4568DC)' }}
+          className="w-full p-3 text-lg text-white rounded-md mb-4 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-purple-500 to-blue-500"
         >
           {loading ? 'Generating...' : 'Create a Picture'}
         </button>
@@ -112,24 +133,47 @@ const ImageGenerator = () => {
             Refresh
           </button>
           <button
-            onClick={() => handleDownload(images[0]?.url)}
+            onClick={() => setShowCheckboxes(true)}
             disabled={images.length === 0}
             className="px-4 py-2 text-[#1f1f1f] bg-white border border-gray-300 rounded-md transition duration-300 ease-in-out hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FontAwesomeIcon icon={faDownload} className="mr-2" />
-            Download
+            Download Image(s)
           </button>
         </div>
       </div>
 
       <div className="mt-8 w-full max-w-md">
         {images.map((img, index) => (
-          <div key={index} className="mb-6">
+          <div key={index} className="mb-6 relative">
+            {showCheckboxes && (
+              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10">
+                <input
+                  type="checkbox"
+                  checked={selectedImages.includes(index)}
+                  onChange={() => toggleImageSelection(index)}
+                  className="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                />
+              </div>
+            )}
             <img src={img.url} alt={img.description} className="w-full h-auto rounded-md shadow-md" />
             <p className="mt-2 text-gray-600">{img.description}</p>
           </div>
         ))}
       </div>
+
+      {showCheckboxes && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
+          <button
+            onClick={handleDownloadSelected}
+            disabled={selectedImages.length === 0}
+            className="px-6 py-3 text-white bg-blue-500 rounded-md transition duration-300 ease-in-out hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FontAwesomeIcon icon={faCheck} className="mr-2" />
+            Download Selected ({selectedImages.length})
+          </button>
+        </div>
+      )}
     </div>
   );
 };
