@@ -93,6 +93,13 @@ const ImageGenerator = () => {
     }
   };
 
+  const toggleCheckboxes = () => {
+    setShowCheckboxes(!showCheckboxes);
+    if (showCheckboxes) {
+      setSelectedImages([]);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans p-6 flex flex-col items-center">
       <div className="w-full flex justify-center mb-3">
@@ -133,17 +140,17 @@ const ImageGenerator = () => {
             Refresh
           </button>
           <button
-            onClick={() => setShowCheckboxes(true)}
+            onClick={toggleCheckboxes}
             disabled={images.length === 0}
-            className="px-4 py-2 text-[#1f1f1f] bg-white border border-gray-300 rounded-md transition duration-300 ease-in-out hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`px-4 py-2 text-[#1f1f1f] bg-white border border-gray-300 rounded-md transition duration-300 ease-in-out hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed ${showCheckboxes ? 'bg-gray-200' : ''}`}
           >
             <FontAwesomeIcon icon={faDownload} className="mr-2" />
-            Download Image(s)
+            {showCheckboxes ? 'Cancel Download' : 'Download Image(s)'}
           </button>
         </div>
       </div>
 
-      <div className="mt-8 w-full max-w-md">
+      <div className="mt-8 w-full max-w-md mb-20">
         {images.map((img, index) => (
           <div key={index} className="mb-6 relative">
             {showCheckboxes && (
@@ -167,7 +174,7 @@ const ImageGenerator = () => {
           <button
             onClick={handleDownloadSelected}
             disabled={selectedImages.length === 0}
-            className="px-6 py-3 text-white bg-blue-500 rounded-md transition duration-300 ease-in-out hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 text-white bg-[#666ff2] rounded-md transition duration-300 ease-in-out hover:bg-[#5158c2] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
             Download Selected ({selectedImages.length})
