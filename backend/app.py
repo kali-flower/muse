@@ -30,17 +30,18 @@ def generate_prompt():
     model = genai.GenerativeModel("gemini-1.5-flash")
     
     try:
-        # make more specific instructions for Gemini
+        # updated Gemini prompt
         gemini_prompt = f"""
-        Generate 5 specific, visual keywords directly related to '{user_prompt}'.
-        Focus on describing:
-        1. The main subject itself
-        2. Its physical characteristics
-        3. Its typical environment
-        4. Related objects or concepts
-        5. Actions or states associated with it
+        Analyze the phrase '{user_prompt}' and generate 5 specific, visual keywords.
+        Focus on:
+        1. The main subject or technique mentioned
+        2. Visual characteristics or styles implied
+        3. Specific elements or props that might be involved
+        4. Potential settings or environments
+        5. Mood or atmosphere suggested
 
-        Ensure all keywords are closely tied to the visual aspects of '{user_prompt}'.
+        Ensure all keywords are directly relevant to creating visually striking images of '{user_prompt}'.
+        Prioritize uncommon or specific terms over general ones.
         Separate keywords with commas.
         """
         
@@ -50,8 +51,8 @@ def generate_prompt():
         # process keywords
         keywords_list = [kw.strip() for kw in generated_keywords.split(',')]
         
-        # construct search query using user prompt and top 3 keywords
-        search_query = f"{user_prompt} {' '.join(keywords_list[:3])}"
+        # make search query using user prompt + 4 keywords
+        search_query = f"{user_prompt} {' '.join(keywords_list[:4])}"
         
         unsplash_images = search_unsplash_images(search_query, user_prompt)
         
