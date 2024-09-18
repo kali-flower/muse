@@ -47,6 +47,10 @@ const ImageGenerator = () => {
       }
     }
   };
+  
+  const handleRefresh = () => {
+    handleGenerate();
+  };
 
   const toggleImageSelection = (index) => {
     setSelectedImages(prev => 
