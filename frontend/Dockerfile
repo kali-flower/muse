@@ -13,6 +13,9 @@ RUN npm install
 # Copy the current directory contents into the container at /app
 COPY . .
 
+# Copy the .env file
+COPY .env .env
+
 # Build the app for production
 RUN npm run build
 
