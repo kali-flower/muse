@@ -29,12 +29,17 @@ def home():
 # generates prompt keywords and fetches Unsplash images
 @app.route('/generate', methods=['POST'])
 def generate_prompt():
-    data = request.json
-    user_prompt = data.get('prompt')
-
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    
     try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No JSON data received"}), 400
+        
+        user_prompt = data.get('prompt')
+        if not user_prompt:
+            return jsonify({"error": "No prompt provided"}), 400
+
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
         # updated Gemini prompt
         gemini_prompt = f"""
         Analyze the phrase '{user_prompt}' and generate 5 specific, visual keywords.
@@ -49,21 +54,26 @@ def generate_prompt():
         Prioritize uncommon or specific terms over general ones.
         Separate keywords with commas.
         """
-        
+
+        # generate keywords using Gemini API
         response = model.generate_content(gemini_prompt)
         generated_keywords = response.text.strip()
         
-        # process keywords
+        # process keywords into a list
         keywords_list = [kw.strip() for kw in generated_keywords.split(',')]
-        
-        # make search query using user prompt + 4 keywords
+
+        # create search query for Unsplash using the user prompt and 4 keywords
         search_query = f"{user_prompt} {' '.join(keywords_list[:4])}"
-        
+
+        # fetch images from Unsplash using the generated search query
         unsplash_images = search_unsplash_images(search_query, user_prompt)
         
         return jsonify({"keywords": generated_keywords, "images": unsplash_images})
+
     except Exception as e:
+        app.logger.error(f"Error in generate_prompt: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 def search_unsplash_images(keywords, original_prompt, fallback=False):
     url = "https://api.unsplash.com/search/photos"
