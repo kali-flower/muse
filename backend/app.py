@@ -10,7 +10,7 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/generate": {"origins": "*"}})
+CORS(app, resources={r"/generate": {"origins": "http://54.215.233.110:3000"}})
 
 # # Configure CORS 
 # ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '*')

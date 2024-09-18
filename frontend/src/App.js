@@ -24,12 +24,20 @@ const ImageGenerator = () => {
         });
   
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
   
-        const data = await response.json();
-        setImages(data.images);
-        console.log("Generated Keywords:", data.keywords);
+        const text = await response.text(); // Get the raw text of the response
+        console.log("Raw response:", text); // Log the raw response
+  
+        try {
+          const data = JSON.parse(text); // Try to parse the response as JSON
+          setImages(data.images);
+          console.log("Generated Keywords:", data.keywords);
+        } catch (parseError) {
+          console.error("Error parsing JSON:", parseError);
+          throw new Error("The server response was not valid JSON");
+        }
       } catch (error) {
         console.error("Error fetching images:", error);
       } finally {
@@ -38,10 +46,6 @@ const ImageGenerator = () => {
         setSelectedImages([]);
       }
     }
-  };
-  
-  const handleRefresh = () => {
-    handleGenerate();
   };
 
   const toggleImageSelection = (index) => {
