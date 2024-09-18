@@ -10,11 +10,11 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app, resources={r"/generate": {"origins": "*"}})
 
-# Configure CORS 
-ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '*')
-CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGIN}})
+# # Configure CORS 
+# ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '*')
+# CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGIN}})
 
 # configure API key 
 genai.configure(api_key=os.environ["API_KEY"])
