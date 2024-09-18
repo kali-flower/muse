@@ -15,6 +15,7 @@ const ImageGenerator = () => {
     if (prompt.trim()) {
       setLoading(true);
       try {
+        console.log("API URL:", `${process.env.REACT_APP_API_URL}/generate`);
         const response = await fetch(`${process.env.REACT_APP_API_URL}/generate`, {
           method: "POST",
           headers: {
@@ -23,15 +24,18 @@ const ImageGenerator = () => {
           body: JSON.stringify({ prompt }),
         });
   
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+  
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
   
-        const text = await response.text(); // Get the raw text of the response
-        console.log("Raw response:", text); // Log the raw response
+        const text = await response.text();
+        console.log("Raw response:", text);
   
         try {
-          const data = JSON.parse(text); // Try to parse the response as JSON
+          const data = JSON.parse(text);
           setImages(data.images);
           console.log("Generated Keywords:", data.keywords);
         } catch (parseError) {
