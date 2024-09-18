@@ -5,3 +5,6 @@
 !.elasticbeanstalk/*.global.yml
 
 .env
+
+bfg-1.14.0.jar
+bfg-1.14.0.jar:Zone.Identifier
