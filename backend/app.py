@@ -10,7 +10,11 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
+
+# Configure CORS 
+ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '*')
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGIN}})
 
 # configure API key 
 genai.configure(api_key=os.environ["API_KEY"])
@@ -92,4 +96,6 @@ def search_unsplash_images(keywords, original_prompt, fallback=False):
         return []
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    # use the environment variable PORT if available
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
